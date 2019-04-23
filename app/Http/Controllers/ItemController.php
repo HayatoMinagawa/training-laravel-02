@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Category;
+use App\Http\Requests\Item\StoreRequest;
 use App\Item;
 use Illuminate\Http\Request;
+
 
 class ItemController extends Controller
 {
@@ -15,7 +18,6 @@ class ItemController extends Controller
     public function index()
     {
         $items = Item::all();
-
         return view('items.index', compact('items'));
     }
 
@@ -26,7 +28,9 @@ class ItemController extends Controller
      */
     public function create()
     {
-        return view('items.create');
+        $categories = Category::listOfOptions();
+
+        return view('items.create', compact('categories'));
     }
 
     /**
@@ -35,10 +39,14 @@ class ItemController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        Item::create([
+        $filename = $request->file->store('public/avatar');
+        $category = category::find($request->input('category_id'));
+
+        $category->items()->create([
             'name' => $request->input('name'),
+            'avatar_filename' => basename($filename),
         ]);
 
         return redirect()->route('items.index');
@@ -63,7 +71,8 @@ class ItemController extends Controller
      */
     public function edit(Item $item)
     {
-        return view('items.edit', compact('item'));
+        $categories = category::listOfOptions();
+        return view('items.edit', compact('item','categories'));
     }
 
     /**
@@ -75,12 +84,12 @@ class ItemController extends Controller
      */
     public function update(Request $request, Item $item)
     {
-        $item->update([
-            'name' => $request->input('name'),
-        ]);
-
+        $item->name = $request->input('name');
+        $category = Category::find($request->input('category_id'));
+        $category->items()->save($item);
         return redirect()->route('items.index');
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -92,7 +101,7 @@ class ItemController extends Controller
     public function destroy(Item $item)
     {
         $item->delete();
-
         return redirect()->route('items.index');
     }
+
 }

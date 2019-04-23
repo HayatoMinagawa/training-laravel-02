@@ -7,6 +7,10 @@
         {{ Form::text('name', $item->name, ['class' => 'form-control']) }}
     </div>
     <div class="form-group">
+        {{ Form::label('category_id', 'カテゴリー：') }}
+        {{ Form::select('category_id', $categories, $item->category->id, ['class' => 'form-control']) }}
+    </div>
+    <div class="form-group">
         {{ Form::submit('更新', ['class' => 'btn btn-success form-control']) }}
     </div>
     {{ Form::close() }}

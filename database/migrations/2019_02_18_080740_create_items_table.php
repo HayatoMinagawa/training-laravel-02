@@ -17,6 +17,7 @@ class CreateItemsTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->timestamps();
+            $table->string('avatar_filename', 100);
         });
     }
 
